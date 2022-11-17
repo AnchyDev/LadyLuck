@@ -111,8 +111,51 @@ private:
     }
 };
 
+class LadyLuckGameObjectScript : public GameObjectScript
+{
+public:
+    LadyLuckGameObjectScript() : GameObjectScript("LadyLuckGameObjectScript") { }
+private:
+    enum LotteryBoxGossips
+    {
+        LOTTERYBOX_GOSSIPTEXT = 444211,
+        LOTTERYBOX_OPEN = 1000,
+        LOTTERYBOX_GOODBYE = 1500
+    };
+
+    bool OnGossipHello(Player* player, GameObject* go)
+    {
+        ClearGossipMenuFor(player);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
+        SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
+    }
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
+    {
+        if (sender != GOSSIP_SENDER_MAIN)
+        {
+            return false;
+        }
+
+        switch (action)
+        {
+        case LOTTERYBOX_OPEN:
+            ChatHandler(player->GetSession()).SendSysMessage("OPEN");
+            break;
+
+        case LOTTERYBOX_GOODBYE:
+            ChatHandler(player->GetSession()).SendSysMessage("GOODBYE");
+            break;
+        }
+
+        return true;
+    }
+};
+
 // Add all scripts in one
 void AddLadyLuckScripts()
 {
     new LadyLuckCreatureScript();
+    new LadyLuckGameObjectScript();
 }
