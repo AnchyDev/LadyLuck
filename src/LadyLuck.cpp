@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Config.h"
 #include "Chat.h"
+#include <AI/ScriptedAI/ScriptedGossip.h>
 
 class LadyLuckCreatureScript : public CreatureScript
 {
@@ -13,10 +14,18 @@ public:
     LadyLuckCreatureScript() : CreatureScript("LadyLuckCreatureScript") { }
 
 private:
+    enum Gossips
+    {
+        LADYLUCK_GOSSIPTEXT = 0,
+        LADYLUCK_ENTERLOTTERY = 1000
+    };
+
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        ChatHandler(player->GetSession()).SendSysMessage(Acore::StringFormatFmt("Hello {}", player->GetName()));
-        return false;
+        ClearGossipMenuFor(player);
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
+        return true;
     }
 };
 
