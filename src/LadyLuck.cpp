@@ -29,7 +29,7 @@ private:
         LADYLUCK_CURRENCY = 37711 //ItemId
     };
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    bool OnGossipHello(Player* player, Creature* creature)
     {
         ClearGossipMenuFor(player);
         AddGossipItemFor(player, GOSSIP_ICON_DOT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
@@ -81,7 +81,7 @@ private:
         }
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
     {
         if (sender != GOSSIP_SENDER_MAIN)
         {
