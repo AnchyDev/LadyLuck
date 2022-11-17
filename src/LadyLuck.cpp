@@ -32,8 +32,8 @@ private:
     bool OnGossipHello(Player* player, Creature* creature)
     {
         ClearGossipMenuFor(player);
-        AddGossipItemFor(player, GOSSIP_ICON_DOT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
-       // AddGossipItemFor(player, GOSSIP_ICON_DOT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
         SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
         return true;
     }
@@ -41,13 +41,13 @@ private:
     void EnterLottery(Player* player)
     {
         CloseGossipMenuFor(player);
-        ChatHandler(player->GetSession()).SendSysMessage("EnterLottery");
+        DeductCurrency(player, 1);
+        player->TeleportTo(0, -8653, -508, 145.406999, 5);
     }
 
     void SayGoodbye(Player* player, Creature* creature)
     {
         CloseGossipMenuFor(player);
-        ChatHandler(player->GetSession()).SendSysMessage("SayGoodbye");
     }
 
     bool CanEnterLottery(Player* player)
@@ -62,22 +62,26 @@ private:
         return true;
     }
 
+    void DeductCurrency(Player* player, uint32 count)
+    {
+        Item* currency = player->GetItemByEntry(LADYLUCK_CURRENCY);
+        player->DestroyItemCount(currency, count, true);
+    }
+
     void ValidateCurrency(Player* player, Creature* creature)
     {
         if (CanEnterLottery(player))
         {
             ClearGossipMenuFor(player);
-            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Yes, I'm sure.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_SUCCESS);
-            AddGossipItemFor(player, GOSSIP_ICON_DOT, "No, I would rather not.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, I'm sure.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_SUCCESS);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would rather not.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
             SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SUCCESS, creature->GetGUID());
-            ChatHandler(player->GetSession()).SendSysMessage("EnterLotteryS");
         }
         else
         {
             ClearGossipMenuFor(player);
-            AddGossipItemFor(player, GOSSIP_ICON_DOT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
             SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL, creature->GetGUID());
-            ChatHandler(player->GetSession()).SendSysMessage("EnterLotteryF");
         }
     }
 
