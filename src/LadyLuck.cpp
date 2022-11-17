@@ -7,11 +7,17 @@
 #include "Config.h"
 #include "Chat.h"
 
-// Add player scripts
 class LadyLuckCreatureScript : public CreatureScript
 {
 public:
     LadyLuckCreatureScript() : CreatureScript("LadyLuckCreatureScript") { }
+
+private:
+    bool OnGossipHello(Player* player, Creature* creature) override
+    {
+        ChatHandler(player->GetSession()).SendSysMessage(Acore::StringFormatFmt("Hello {}", player->GetName()));
+        return false;
+    }
 };
 
 // Add all scripts in one
