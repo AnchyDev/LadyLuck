@@ -122,10 +122,10 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckCurrencyCount = sConfigMgr->GetOption<uint32>("LadyLuck.CurrencyCount", 3);
 
     ladyLuckTele.Map = sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449);
-    ladyLuckTele.X = sConfigMgr->GetOption<uint32>("LadyLuck.TeleX", 0.072697);
-    ladyLuckTele.Y = sConfigMgr->GetOption<uint32>("LadyLuck.TeleY", 9.618815);
-    ladyLuckTele.Z = sConfigMgr->GetOption<uint32>("LadyLuck.TeleZ", -0.227239);
-    ladyLuckTele.O = sConfigMgr->GetOption<uint32>("LadyLuck.TeleO", 1.584149);
+    ladyLuckTele.X = sConfigMgr->GetOption<float>("LadyLuck.TeleX", 0.072697);
+    ladyLuckTele.Y = sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815);
+    ladyLuckTele.Z = sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239);
+    ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
 }
 
 // Add all scripts in one
