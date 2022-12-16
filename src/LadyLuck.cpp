@@ -1,164 +1,137 @@
-/*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
- */
+#include "LadyLuck.h"
 
-#include "ScriptMgr.h"
-#include "Player.h"
-#include "Config.h"
-#include "Chat.h"
-#include <AI/ScriptedAI/ScriptedGossip.h>
-
-class LadyLuckCreatureScript : public CreatureScript
+bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 {
-public:
-    LadyLuckCreatureScript() : CreatureScript("LadyLuckCreatureScript") { }
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
 
-private:
-    enum LadyLuckGossips
+    return true;
+}
+
+void LadyLuckCreatureScript::EnterLottery(Player* player)
+{
+    CloseGossipMenuFor(player);
+    DeductCurrency(player, ladyLuckCurrencyCount);
+    player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+}
+
+void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
+{
+    CloseGossipMenuFor(player);
+}
+
+bool LadyLuckCreatureScript::CanEnterLottery(Player* player)
+{
+    uint32 currencyAmount = player->GetItemCount(ladyLuckCurrency, false);
+
+    if (currencyAmount < ladyLuckCurrencyCount)
     {
-        LADYLUCK_GOSSIPTEXT = 444111,
-        LADYLUCK_GOSSIPTEXT_SUCCESS = 444112,
-        LADYLUCK_GOSSIPTEXT_FAIL = 444113,
-        LADYLUCK_ENTERLOTTERY = 1000,
-        LADYLUCK_ENTERLOTTERY_SUCCESS = 1001,
-        LADYLUCK_GOODBYE = 1500
-    };
+        return false;
+    }
 
-    enum LadyLuckIds
-    {
-        LADYLUCK_CURRENCY = 37711 //ItemId
-    };
+    return true;
+}
 
-    bool OnGossipHello(Player* player, Creature* creature)
+void LadyLuckCreatureScript::DeductCurrency(Player* player, uint32 count)
+{
+    Item* currency = player->GetItemByEntry(ladyLuckCurrency);
+    player->DestroyItemCount(currency, count, true);
+}
+
+void LadyLuckCreatureScript::ValidateCurrency(Player* player, Creature* creature)
+{
+    if (CanEnterLottery(player))
     {
         ClearGossipMenuFor(player);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
-
-        return true;
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, I'm sure.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_SUCCESS);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would rather not.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SUCCESS, creature->GetGUID());
     }
-
-    void EnterLottery(Player* player)
-    {
-        CloseGossipMenuFor(player);
-        DeductCurrency(player, 1);
-        player->TeleportTo(0, -8653, -508, 145.406999, 5);
-    }
-
-    void SayGoodbye(Player* player, Creature* /*creature*/)
-    {
-        CloseGossipMenuFor(player);
-    }
-
-    bool CanEnterLottery(Player* player)
-    {
-        uint32 currencyAmount = player->GetItemCount(LADYLUCK_CURRENCY, false);
-
-        if (currencyAmount < 1)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    void DeductCurrency(Player* player, uint32 count)
-    {
-        Item* currency = player->GetItemByEntry(LADYLUCK_CURRENCY);
-        player->DestroyItemCount(currency, count, true);
-    }
-
-    void ValidateCurrency(Player* player, Creature* creature)
-    {
-        if (CanEnterLottery(player))
-        {
-            ClearGossipMenuFor(player);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, I'm sure.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_SUCCESS);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would rather not.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-            SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SUCCESS, creature->GetGUID());
-        }
-        else
-        {
-            ClearGossipMenuFor(player);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-            SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL, creature->GetGUID());
-        }
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
-    {
-        if (sender != GOSSIP_SENDER_MAIN)
-        {
-            return false;
-        }
-
-        switch (action)
-        {
-        case LADYLUCK_ENTERLOTTERY:
-            ValidateCurrency(player, creature);
-            break;
-
-        case LADYLUCK_ENTERLOTTERY_SUCCESS:
-            EnterLottery(player);
-            break;
-
-        case LADYLUCK_GOODBYE:
-            SayGoodbye(player, creature);
-            break;
-        }
-
-        return true;
-    }
-};
-
-class LadyLuckGameObjectScript : public GameObjectScript
-{
-public:
-    LadyLuckGameObjectScript() : GameObjectScript("LadyLuckGameObjectScript") { }
-private:
-    enum LotteryBoxGossips
-    {
-        LOTTERYBOX_GOSSIPTEXT = 444211,
-        LOTTERYBOX_OPEN = 1000,
-        LOTTERYBOX_GOODBYE = 1500
-    };
-
-    bool OnGossipHello(Player* player, GameObject* go)
+    else
     {
         ClearGossipMenuFor(player);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
-        SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
-
-        return true;
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL, creature->GetGUID());
     }
+}
 
-    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
+bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    if (sender != GOSSIP_SENDER_MAIN)
     {
-        if (sender != GOSSIP_SENDER_MAIN)
-        {
-            return false;
-        }
-
-        switch (action)
-        {
-        case LOTTERYBOX_OPEN:
-            ChatHandler(player->GetSession()).SendSysMessage("OPEN");
-            break;
-
-        case LOTTERYBOX_GOODBYE:
-            ChatHandler(player->GetSession()).SendSysMessage("GOODBYE");
-            break;
-        }
-
-        return true;
+        return false;
     }
-};
+
+    switch (action)
+    {
+    case LADYLUCK_ENTERLOTTERY:
+        ValidateCurrency(player, creature);
+        break;
+
+    case LADYLUCK_ENTERLOTTERY_SUCCESS:
+        EnterLottery(player);
+        break;
+
+    case LADYLUCK_GOODBYE:
+        SayGoodbye(player, creature);
+        break;
+    }
+
+    return true;
+}
+
+
+bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
+{
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
+    SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
+
+    return true;
+}
+
+bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
+{
+    if (sender != GOSSIP_SENDER_MAIN)
+    {
+        return false;
+    }
+
+    switch (action)
+    {
+    case LOTTERYBOX_OPEN:
+        ChatHandler(player->GetSession()).SendSysMessage("OPEN");
+        break;
+
+    case LOTTERYBOX_GOODBYE:
+        ChatHandler(player->GetSession()).SendSysMessage("GOODBYE");
+        break;
+    }
+
+    return true;
+}
+
+void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
+{
+    ladyLuckEnabled = sConfigMgr->GetOption<bool>("LadyLuck.Enable", false);
+
+    ladyLuckCurrency = sConfigMgr->GetOption<uint32>("LadyLuck.Currency", 37711);
+    ladyLuckCurrencyCount = sConfigMgr->GetOption<uint32>("LadyLuck.CurrencyCount", 3);
+
+    ladyLuckTele.Map = sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449);
+    ladyLuckTele.X = sConfigMgr->GetOption<uint32>("LadyLuck.TeleX", 0.072697);
+    ladyLuckTele.Y = sConfigMgr->GetOption<uint32>("LadyLuck.TeleY", 9.618815);
+    ladyLuckTele.Z = sConfigMgr->GetOption<uint32>("LadyLuck.TeleZ", -0.227239);
+    ladyLuckTele.O = sConfigMgr->GetOption<uint32>("LadyLuck.TeleO", 1.584149);
+}
 
 // Add all scripts in one
 void AddLadyLuckScripts()
 {
+    new LadyLuckWorldScript();
     new LadyLuckCreatureScript();
     new LadyLuckGameObjectScript();
 }

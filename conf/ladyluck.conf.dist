@@ -5,13 +5,74 @@
 [worldserver]
 
 ########################################
-# LadyLuck configuration
+# LadyLuck General
 ########################################
 #
 #    LadyLuck.Enable
-#        Description: Enable my module and print "Hello World" message at server start
+#        Description: Enables the LadyLuck module.
 #        Default:     0 - Disabled
 #                     1 - Enabled
 #
 
 LadyLuck.Enable = 0
+
+#
+#    LadyLuck.Currency
+#        Description: The currency used to enter the lottery room.
+#        Default:     37711
+#
+
+LadyLuck.Currency = 37711
+
+#
+#    LadyLuck.CurrencyCount
+#        Description: The amount of currency used to enter the lottery room.
+#        Default:     3
+#
+
+LadyLuck.CurrencyCount = 3
+
+########################################
+# Lottery Location
+########################################
+#
+#    LadyLuck.Map
+#        Description: The MapID for the lottery room.
+#        Default:     449
+#
+
+LadyLuck.Map = 449
+
+#
+#    LadyLuck.X
+#        Description: The X coordinate of the lottery room.
+#        Default:     0.072697
+#
+
+LadyLuck.X = 0.072697
+
+#
+#    LadyLuck.Y
+#        Description: The Y coordinate of the lottery room.
+#        Default:     9.618815
+#
+
+LadyLuck.Y = 9.618815
+
+#
+#    LadyLuck.Z
+#        Description: The Z coordinate of the lottery room.
+#        Default:     -0.227239
+#
+
+LadyLuck.Z = -0.227239
+
+#
+#    LadyLuck.O
+#        Description: The orientation of the player after teleporting.
+#        Default:     1.584149
+#
+
+LadyLuck.O = 1.584149
+
+########################################
