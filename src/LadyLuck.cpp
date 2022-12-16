@@ -35,6 +35,7 @@ private:
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
         SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
+
         return true;
     }
 
@@ -45,7 +46,7 @@ private:
         player->TeleportTo(0, -8653, -508, 145.406999, 5);
     }
 
-    void SayGoodbye(Player* player, Creature* creature)
+    void SayGoodbye(Player* player, Creature* /*creature*/)
     {
         CloseGossipMenuFor(player);
     }
@@ -129,9 +130,11 @@ private:
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
         SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
+
+        return true;
     }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
     {
         if (sender != GOSSIP_SENDER_MAIN)
         {
