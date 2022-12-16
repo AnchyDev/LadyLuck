@@ -14,6 +14,19 @@ void LadyLuckCreatureScript::EnterLottery(Player* player)
 {
     CloseGossipMenuFor(player);
     DeductCurrency(player, ladyLuckCurrencyCount);
+
+    PlayerInfo playerInfo;
+
+    playerInfo.playerGuid = player->GetGUID();
+
+    playerInfo.previousLocation.Map = player->GetMapId();
+    playerInfo.previousLocation.X = player->GetPositionX();
+    playerInfo.previousLocation.Y = player->GetPositionY();
+    playerInfo.previousLocation.Z = player->GetPositionZ();
+    playerInfo.previousLocation.O = player->GetOrientation();
+
+    playerRestoreInfo.push_back(playerInfo);
+
     player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
 }
 
@@ -89,7 +102,6 @@ bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
     SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
-
     return true;
 }
 
@@ -128,10 +140,48 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
 }
 
+bool LadyLuckPlayerScript::OnBeforeTeleport(Player* player, uint32 /*mapId*/, float /*x*/, float /*y*/, float /*z*/, float /*o*/, uint32 /*options*/, Unit* /*target*/)
+{
+    if (player->GetMapId() != ladyLuckTele.Map)
+    {
+        return true;
+    }
+
+    bool canRestore;
+    TeleportInfo restorePoint;
+    std::vector<PlayerInfo>::iterator restoreIt;
+
+    for (auto it = playerRestoreInfo.begin(); it != playerRestoreInfo.end(); ++it)
+    {
+        if (it != playerRestoreInfo.end())
+        {
+            if (it->playerGuid != player->GetGUID())
+            {
+                continue;
+            }
+
+            canRestore = true;
+            restorePoint = it->previousLocation;
+            restoreIt = it;
+            break;
+        }
+    }
+
+    if (canRestore)
+    {
+        playerRestoreInfo.erase(restoreIt);
+        player->TeleportTo(restorePoint.Map, restorePoint.X, restorePoint.Y, restorePoint.Z, restorePoint.O);
+        return false;
+    }
+
+    return true;
+}
+
 // Add all scripts in one
 void AddLadyLuckScripts()
 {
     new LadyLuckWorldScript();
+    new LadyLuckPlayerScript();
     new LadyLuckCreatureScript();
     new LadyLuckGameObjectScript();
 }

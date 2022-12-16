@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Chat.h"
 #include <AI/ScriptedAI/ScriptedGossip.h>
+#include <vector>
 
 struct TeleportInfo
 {
@@ -16,10 +17,18 @@ struct TeleportInfo
     float O;
 };
 
+struct PlayerInfo
+{
+    TeleportInfo previousLocation;
+    ObjectGuid playerGuid;
+};
+
 bool ladyLuckEnabled;
 uint32 ladyLuckCurrency;
 uint32 ladyLuckCurrencyCount;
 TeleportInfo ladyLuckTele;
+
+std::vector<PlayerInfo> playerRestoreInfo;
 
 class LadyLuckCreatureScript : public CreatureScript
 {
@@ -68,6 +77,14 @@ public:
     LadyLuckWorldScript() : WorldScript("LadyLuckWorldScript") { }
 private:
     void OnAfterConfigLoad(bool /*reload*/) override;
+};
+
+class LadyLuckPlayerScript : public PlayerScript
+{
+public:
+    LadyLuckPlayerScript() : PlayerScript("LadyLuckPlayerScript") { }
+private:
+    bool OnBeforeTeleport(Player* /*player*/, uint32 /*mapId*/, float /*x*/, float /*y*/, float /*z*/, float /*o*/, uint32 /*options*/, Unit* /*target*/) override;
 };
 
 #endif //MODULE_LADYLUCK_H
