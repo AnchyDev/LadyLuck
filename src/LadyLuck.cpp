@@ -277,6 +277,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         if (player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item) == EQUIP_ERR_OK)
         {
             player->StoreItem(dest, item, true);
+            player->SendNewItem(item, item->GetCount(), true, false);
             UpdateCanLoot(player, false);
         }
         else
