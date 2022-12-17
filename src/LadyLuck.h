@@ -24,6 +24,13 @@ struct PlayerLotteryInfo
     bool canLoot;
 };
 
+struct LotteryLoot
+{
+    uint32 itemId;
+    uint32 itemCount;
+    uint32 roll;
+};
+
 bool ladyLuckEnabled;
 
 uint32 ladyLuckCurrency;
@@ -36,6 +43,7 @@ std::string ladyLuckMoneyStr;
 TeleportInfo ladyLuckTele;
 
 std::vector<PlayerLotteryInfo> playerLotteryInfo;
+std::vector<LotteryLoot> lotteryLootPool;
 
 bool IsInLottery(Player* /*player*/);
 void UpdateCanLoot(Player* /*player*/, bool /*state*/);

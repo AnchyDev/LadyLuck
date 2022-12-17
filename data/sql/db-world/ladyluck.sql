@@ -39,3 +39,22 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES (2136209, 4441111, 449, 0, 0, 1, 1, 7.09564, 35.597, 1.05583, 4.10449, -0, -0, -0.886325, 0.463065, 300, 0, 1, '', NULL);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES (2136208, 4441111, 449, 0, 0, 1, 1, -8.67206, 36.3204, 1.05583, 5.30929, -0, -0, -0.467929, 0.883766, 300, 0, 1, '', NULL);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES (2136207, 4441111, 449, 0, 0, 1, 1, 7.82718, 20.6952, 1.05583, 3.55, -0, -0, -0.979223, 0.202788, 300, 0, 1, '', NULL);
+
+CREATE TABLE IF NOT EXISTS `ladyluck_lottery_loot` (
+  `item_id` int(11) DEFAULT NULL,
+  `item_count` int(11) DEFAULT NULL,
+  `roll` int(11) DEFAULT NULL,
+  `comment` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DELETE FROM `ladyluck_lottery_loot`;
+INSERT INTO `ladyluck_lottery_loot` (`item_id`, `item_count`, `roll`, `comment`) VALUES
+	(21640, 1, 25, 'Lunar Fireworks Pack'),
+	(43489, 5, 50, 'Mohawk Grenade'),
+	(43486, 1, 20, 'Mohawk Mask'),
+	(38577, 5, 50, 'Party Grenade'),
+	(34493, 1, 5, 'Dragon Kite'),
+	(49287, 1, 5, 'Tuskarr Kite'),
+	(20371, 1, 5, 'Blue Murloc Egg'),
+	(22114, 1, 5, 'Pink Murloc Egg'),
+	(38050, 1, 5, 'Soul-Trader Beacon');

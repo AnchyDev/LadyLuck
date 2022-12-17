@@ -245,8 +245,27 @@ bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
 void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 {
     CloseGossipMenuFor(player);
-    player->AddItem(ladyLuckCurrency, urand(0,5));
-    UpdateCanLoot(player, false);
+
+    uint32 roll = urand(0, 100);
+    std::vector<LotteryLoot> lootPool;
+
+    for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
+    {
+        if (it->roll <= roll)
+        {
+            lootPool.push_back(*it);
+        }
+    }
+
+    roll = urand(0, lootPool.size());
+
+    LotteryLoot item = lootPool.at(roll);
+
+    if (item.itemId)
+    {
+        player->AddItem(item.itemId, item.itemCount);
+        UpdateCanLoot(player, false);
+    }
 }
 
 bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
@@ -270,8 +289,13 @@ bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/
     return true;
 }
 
-void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
+void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 {
+    if (reload)
+    {
+        lotteryLootPool.clear();
+    }
+
     ladyLuckEnabled = sConfigMgr->GetOption<bool>("LadyLuck.Enable", false);
 
     ladyLuckCurrency = sConfigMgr->GetOption<uint32>("LadyLuck.Currency", 37711);
@@ -284,6 +308,25 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckTele.Y = sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815);
     ladyLuckTele.Z = sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239);
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
+
+    QueryResult result = WorldDatabase.Query("SELECT item_id, item_count, roll FROM ladyluck_lottery_loot");
+
+    if (!result)
+    {
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+        LotteryLoot lotteryLoot;
+
+        lotteryLoot.itemId = fields[0].Get<uint32>();
+        lotteryLoot.itemCount = fields[1].Get<uint32>();
+        lotteryLoot.roll = fields[2].Get<uint32>();
+
+        lotteryLootPool.push_back(lotteryLoot);
+    } while (result->NextRow());
 }
 
 // Add all scripts in one
