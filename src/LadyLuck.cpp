@@ -257,7 +257,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         }
     }
 
-    roll = urand(0, lootPool.size());
+    roll = urand(0, lootPool.size() - 1);
 
     LotteryLoot item = lootPool.at(roll);
 
