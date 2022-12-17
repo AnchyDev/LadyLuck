@@ -244,7 +244,9 @@ bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
 
 void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 {
+    CloseGossipMenuFor(player);
     player->AddItem(ladyLuckCurrency, urand(0,5));
+    UpdateCanLoot(player, false);
 }
 
 bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
