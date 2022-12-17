@@ -272,17 +272,14 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     if (lootItem.itemId)
     {
-        Item* item = Item::CreateItem(lootItem.itemId, lootItem.itemCount);
         ItemPosCountVec dest;
-        if (player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item) == EQUIP_ERR_OK)
+        if (player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, lootItem.itemId, lootItem.itemCount) == EQUIP_ERR_OK)
         {
-            player->StoreItem(dest, item, true);
-            player->SendNewItem(item, item->GetCount(), true, false);
+            player->StoreNewItem(dest, lootItem.itemId, true);
             UpdateCanLoot(player, false);
         }
         else
         {
-            delete item;
             player->SendItemRetrievalMail({ {lootItem.itemId, lootItem.itemCount} });
         }
     }
