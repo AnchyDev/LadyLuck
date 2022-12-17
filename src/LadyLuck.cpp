@@ -21,7 +21,7 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 
 void LadyLuckCreatureScript::EnterLottery(Player* player)
 {
-    if (!IsInLottery)
+    if (!IsInLottery(player))
     {
         PlayerLotteryInfo playerInfo;
 
