@@ -89,13 +89,14 @@ private:
     enum LotteryBoxGossips
     {
         LOTTERYBOX_GOSSIPTEXT = 444211,
+        LOTTERYBOX_GOSSIPTEXT_DENY = 444212,
         LOTTERYBOX_OPEN = 1000,
-        LOTTERYBOX_DENY = 1001,
         LOTTERYBOX_GOODBYE = 1500
     };
 
     bool OnGossipHello(Player* /*player*/, GameObject* /*go*/) override;
     bool OnGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) override;
+    void OpenLotteryBox(Player* /*player*/);
 };
 
 class LadyLuckWorldScript : public WorldScript

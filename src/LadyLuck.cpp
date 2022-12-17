@@ -236,10 +236,15 @@ bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
     }
     else
     {
-        SendGossipMenuFor(player, LOTTERYBOX_DENY, go->GetGUID());
+        SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT_DENY, go->GetGUID());
     }
     
     return true;
+}
+
+void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
+{
+    player->AddItem(ladyLuckCurrency, urand(0,5));
 }
 
 bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
@@ -252,12 +257,11 @@ bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/
     switch (action)
     {
     case LOTTERYBOX_OPEN:
-        ChatHandler(player->GetSession()).SendSysMessage("OPEN");
-
+        OpenLotteryBox(player);
         break;
 
     case LOTTERYBOX_GOODBYE:
-        ChatHandler(player->GetSession()).SendSysMessage("GOODBYE");
+        CloseGossipMenuFor(player);
         break;
     }
 
