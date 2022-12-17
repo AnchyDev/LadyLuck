@@ -4,10 +4,17 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 {
     ClearGossipMenuFor(player);
 
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+    if (IsInLottery(player))
+    {
+        PromptExit(player, creature);
+    }
+    else
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
 
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
+    }
 
     return true;
 }
@@ -163,11 +170,6 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
     if (sender != GOSSIP_SENDER_MAIN)
     {
         return false;
-    }
-
-    if (IsInLottery(player))
-    {
-        PromptExit(player, creature);
     }
 
     switch (action)
