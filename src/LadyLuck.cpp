@@ -133,8 +133,9 @@ void LadyLuckCreatureScript::ExitLottery(Player* player)
 {
     CloseGossipMenuFor(player);
 
-    TeleportInfo* teleInfo;
-    std::vector<PlayerLotteryInfo>::iterator* itToRemove;
+    TeleportInfo* teleInfo = nullptr;
+    std::vector<PlayerLotteryInfo>::iterator* itToRemove = nullptr;
+
     for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
     {
         if (it->playerGuid == player->GetGUID())
@@ -145,7 +146,7 @@ void LadyLuckCreatureScript::ExitLottery(Player* player)
         }
     }
 
-    if(teleInfo && itToRemove)
+    if(teleInfo != nullptr && itToRemove != nullptr)
     {
         RestorePlayer(player, teleInfo);
         playerLotteryInfo.erase(*itToRemove);
