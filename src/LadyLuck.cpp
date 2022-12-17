@@ -149,8 +149,11 @@ void LadyLuckCreatureScript::ExitLottery(Player* player)
         }
     }
 
-    RestorePlayer(player, teleInfo);
-    playerLotteryInfo.erase(*itToRemove);
+    if(teleInfo)
+    {
+        RestorePlayer(player, teleInfo);
+        playerLotteryInfo.erase(*itToRemove);
+    }
 }
 
 void LadyLuckCreatureScript::RestorePlayer(Player* player, TeleportInfo* teleInfo)
