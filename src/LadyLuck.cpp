@@ -21,21 +21,28 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 
 void LadyLuckCreatureScript::EnterLottery(Player* player)
 {
-    PlayerLotteryInfo playerInfo;
-    
-    playerInfo.playerGuid = player->GetGUID();
-    
-    playerInfo.previousLocation.Map = player->GetMapId();
-    playerInfo.previousLocation.X = player->GetPositionX();
-    playerInfo.previousLocation.Y = player->GetPositionY();
-    playerInfo.previousLocation.Z = player->GetPositionZ();
-    playerInfo.previousLocation.O = player->GetOrientation();
-    
-    playerInfo.canLoot = true;
-    
-    playerLotteryInfo.push_back(playerInfo);
-    
-    player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+    if (!IsInLottery)
+    {
+        PlayerLotteryInfo playerInfo;
+
+        playerInfo.playerGuid = player->GetGUID();
+
+        playerInfo.previousLocation.Map = player->GetMapId();
+        playerInfo.previousLocation.X = player->GetPositionX();
+        playerInfo.previousLocation.Y = player->GetPositionY();
+        playerInfo.previousLocation.Z = player->GetPositionZ();
+        playerInfo.previousLocation.O = player->GetOrientation();
+
+        playerInfo.canLoot = true;
+
+        playerLotteryInfo.push_back(playerInfo);
+
+        player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+    }
+    else
+    {
+        UpdateCanLoot(player, true);
+    }
 }
 
 void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
