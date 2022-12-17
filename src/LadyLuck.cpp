@@ -257,9 +257,18 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         }
     }
 
-    roll = urand(0, lootPool.size() - 1);
+    LotteryLoot item;
 
-    LotteryLoot item = lootPool.at(roll);
+    if (lootPool.size() == 0)
+    {
+        roll = urand(0, lotteryLootPool.size() - 1);
+        item = lotteryLootPool.at(roll);
+    }
+    else
+    {
+        roll = urand(0, lootPool.size() - 1);
+        item = lootPool.at(roll);
+    }
 
     if (item.itemId)
     {
