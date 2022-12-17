@@ -71,7 +71,7 @@ private:
     void ValidateCurrency(Player* /*player*/, Creature* /*creature*/);
     void DeductCurrency(Player* /*player*/, uint32 /*count*/);
     bool CanEnterLottery(Player* /*player*/);
-    void EnterLottery(Player* /*player*/, bool /*retry*/);
+    void EnterLottery(Player* /*player*/);
     void DisplayLotteryOptions(Player* /*player*/, Creature* /*creature*/);
     void ExitLottery(Player* /*player*/);
     void RestorePlayer(Player* /*player*/, TeleportInfo* /*teleInfo*/);

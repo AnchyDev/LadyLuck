@@ -19,38 +19,23 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
     return true;
 }
 
-void LadyLuckCreatureScript::EnterLottery(Player* player, bool retry)
+void LadyLuckCreatureScript::EnterLottery(Player* player)
 {
-    CloseGossipMenuFor(player);
-
-    if (!retry)
-    {
-        PlayerLotteryInfo playerInfo;
-
-        playerInfo.playerGuid = player->GetGUID();
-
-        playerInfo.previousLocation.Map = player->GetMapId();
-        playerInfo.previousLocation.X = player->GetPositionX();
-        playerInfo.previousLocation.Y = player->GetPositionY();
-        playerInfo.previousLocation.Z = player->GetPositionZ();
-        playerInfo.previousLocation.O = player->GetOrientation();
-
-        playerInfo.canLoot = true;
-
-        playerLotteryInfo.push_back(playerInfo);
-
-        player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
-
-        DeductCurrency(player, ladyLuckCurrencyCount);
-    }
-    else
-    {
-        if (!CanLoot(player))
-        {
-            UpdateCanLoot(player, true);
-            DeductCurrency(player, ladyLuckCurrencyCount);
-        }
-    }
+    PlayerLotteryInfo playerInfo;
+    
+    playerInfo.playerGuid = player->GetGUID();
+    
+    playerInfo.previousLocation.Map = player->GetMapId();
+    playerInfo.previousLocation.X = player->GetPositionX();
+    playerInfo.previousLocation.Y = player->GetPositionY();
+    playerInfo.previousLocation.Z = player->GetPositionZ();
+    playerInfo.previousLocation.O = player->GetOrientation();
+    
+    playerInfo.canLoot = true;
+    
+    playerLotteryInfo.push_back(playerInfo);
+    
+    player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
 }
 
 void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
@@ -80,10 +65,9 @@ void LadyLuckCreatureScript::ValidateCurrency(Player* player, Creature* creature
 {
     if (CanEnterLottery(player))
     {
-        ClearGossipMenuFor(player);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, I'm sure.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_SUCCESS);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would rather not.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SUCCESS, creature->GetGUID());
+        CloseGossipMenuFor(player);
+        DeductCurrency(player, ladyLuckCurrencyCount);
+        EnterLottery(player);
     }
     else
     {
@@ -134,8 +118,7 @@ void LadyLuckCreatureScript::PromptExit(Player* player, Creature* creature)
 {
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, please.", GOSSIP_SENDER_MAIN, LADYLUCK_EXITLOTTERY);
-    std::string promptText = Acore::StringFormatFmt("Are you sure you want to spend {}x[{}]?", ladyLuckCurrencyCount, sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY, promptText, 0U, false);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY);
     SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_EXIT, creature->GetGUID());
 }
 
@@ -174,13 +157,13 @@ void LadyLuckCreatureScript::DisplayLotteryOptions(Player* player, Creature* cre
 
     if (ladyLuckMoney > 0)
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use gold.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_GOLD, "Are you sure you would like to enter the lottery?", ladyLuckMoney, false);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use gold.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_GOLD, "Are you sure you would like to use gold?", ladyLuckMoney, false);
     }
 
     if (ladyLuckCurrency > 0)
     {
         std::string itemName = sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1;
-        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery?|n|nThis will cost you :|n{}x[{}]", ladyLuckCurrencyCount, itemName);
+        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to use currency?|n|nThis will cost you :|n{}x[{}]", ladyLuckCurrencyCount, itemName);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use currency.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_CURRENCY, ladyLuckCurrencyStr, 0, false);
     }
 
@@ -200,12 +183,13 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
         DisplayLotteryOptions(player, creature);
         break;
 
-    case LADYLUCK_ENTERLOTTERY_SUCCESS:
-        EnterLottery(player, false);
+    case LADYLUCK_ENTERLOTTERY_CURRENCY:
+        ValidateCurrency(player, creature);
         break;
 
-    case LADYLUCK_ENTERLOTTERY_RETRY:
-        EnterLottery(player, true);
+    case LADYLUCK_ENTERLOTTERY_GOLD:
+        CloseGossipMenuFor(player);
+        EnterLottery(player);
         break;
 
     case LADYLUCK_EXITLOTTERY:
