@@ -22,7 +22,6 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 void LadyLuckCreatureScript::EnterLottery(Player* player, bool retry)
 {
     CloseGossipMenuFor(player);
-    DeductCurrency(player, ladyLuckCurrencyCount);
 
     if (!retry)
     {
@@ -41,12 +40,15 @@ void LadyLuckCreatureScript::EnterLottery(Player* player, bool retry)
         playerLotteryInfo.push_back(playerInfo);
 
         player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+
+        DeductCurrency(player, ladyLuckCurrencyCount);
     }
     else
     {
-        if (IsInLottery(player))
+        if (!CanLoot(player))
         {
             UpdateCanLoot(player, true);
+            DeductCurrency(player, ladyLuckCurrencyCount);
         }
     }
 }
