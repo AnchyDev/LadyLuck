@@ -257,23 +257,33 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         }
     }
 
-    LotteryLoot item;
+    LotteryLoot lootItem;
 
     if (lootPool.size() == 0)
     {
         roll = urand(0, lotteryLootPool.size() - 1);
-        item = lotteryLootPool.at(roll);
+        lootItem = lotteryLootPool.at(roll);
     }
     else
     {
         roll = urand(0, lootPool.size() - 1);
-        item = lootPool.at(roll);
+        lootItem = lootPool.at(roll);
     }
 
-    if (item.itemId)
+    if (lootItem.itemId)
     {
-        player->AddItem(item.itemId, item.itemCount);
-        UpdateCanLoot(player, false);
+        Item* item = Item::CreateItem(lootItem.itemId, lootItem.itemCount);
+        ItemPosCountVec dest;
+        if (player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, item))
+        {
+            player->StoreItem(dest, item, true);
+            UpdateCanLoot(player, false);
+        }
+        else
+        {
+            delete item;
+            OpenLotteryBox(player);
+        }
     }
 }
 
