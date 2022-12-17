@@ -28,6 +28,10 @@ bool ladyLuckEnabled;
 
 uint32 ladyLuckCurrency;
 uint32 ladyLuckCurrencyCount;
+std::string ladyLuckCurrencyStr;
+
+uint32 ladyLuckMoney;
+std::string ladyLuckMoneyStr;
 
 TeleportInfo ladyLuckTele;
 
@@ -49,10 +53,13 @@ private:
         LADYLUCK_GOSSIPTEXT_SUCCESS = 444112,
         LADYLUCK_GOSSIPTEXT_FAIL = 444113,
         LADYLUCK_GOSSIPTEXT_EXIT = 444114,
+        LADYLUCK_GOSSIPTEXT_SELECT_CURRENCY = 444115,
 
         LADYLUCK_ENTERLOTTERY = 1000,
         LADYLUCK_ENTERLOTTERY_SUCCESS = 1001,
         LADYLUCK_ENTERLOTTERY_RETRY = 1002,
+        LADYLUCK_ENTERLOTTERY_GOLD = 1003,
+        LADYLUCK_ENTERLOTTERY_CURRENCY = 1004,
 
         LADYLUCK_EXITLOTTERY = 1101,
 
@@ -65,6 +72,7 @@ private:
     void DeductCurrency(Player* /*player*/, uint32 /*count*/);
     bool CanEnterLottery(Player* /*player*/);
     void EnterLottery(Player* /*player*/, bool /*retry*/);
+    void DisplayLotteryOptions(Player* /*player*/, Creature* /*creature*/);
     void ExitLottery(Player* /*player*/);
     void RestorePlayer(Player* /*player*/, TeleportInfo* /*teleInfo*/);
     void PromptExit(Player* /*player*/, Creature* /*creature*/);

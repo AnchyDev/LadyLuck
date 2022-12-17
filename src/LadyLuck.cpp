@@ -168,6 +168,23 @@ void LadyLuckCreatureScript::RestorePlayer(Player* player, TeleportInfo* teleInf
     player->TeleportTo(teleInfo->Map, teleInfo->X, teleInfo->Y, teleInfo->Z, teleInfo->O);
 }
 
+void LadyLuckCreatureScript::DisplayLotteryOptions(Player* player, Creature* creature)
+{
+    ClearGossipMenuFor(player);
+
+    if (ladyLuckMoney > 0)
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use gold.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_GOLD, "Are you sure you would like to enter the lottery?", ladyLuckMoney, false);
+    }
+
+    if (ladyLuckCurrency > 0)
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use currency.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_CURRENCY, ladyLuckCurrencyStr, 0, false);
+    }
+
+    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SELECT_CURRENCY, creature);
+}
+
 bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     if (sender != GOSSIP_SENDER_MAIN)
@@ -178,7 +195,7 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
     switch (action)
     {
     case LADYLUCK_ENTERLOTTERY:
-        ValidateCurrency(player, creature);
+        DisplayLotteryOptions(player, creature);
         break;
 
     case LADYLUCK_ENTERLOTTERY_SUCCESS:
@@ -254,6 +271,12 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckTele.Y = sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815);
     ladyLuckTele.Z = sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239);
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
+
+    if (ladyLuckCurrency > 0)
+    {
+        std::string itemName = sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1;
+        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery ? | n | nThis will cost you : | n{}x[{}]", ladyLuckCurrencyCount, itemName);
+    }
 }
 
 // Add all scripts in one
