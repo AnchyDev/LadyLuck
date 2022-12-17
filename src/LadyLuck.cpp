@@ -10,7 +10,7 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
     }
     else
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery room.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
 
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
         SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
