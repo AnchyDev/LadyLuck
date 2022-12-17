@@ -134,7 +134,8 @@ void LadyLuckCreatureScript::PromptExit(Player* player, Creature* creature)
 {
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, please.", GOSSIP_SENDER_MAIN, LADYLUCK_EXITLOTTERY);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY, "Are you sure?", 0U, false);
+    std::string promptText = Acore::StringFormatFmt("Are you sure you want to spend {}x[{}]?", ladyLuckCurrencyCount, sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY, promptText, 0U, false);
     SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_EXIT, creature->GetGUID());
 }
 
