@@ -266,6 +266,8 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckCurrency = sConfigMgr->GetOption<uint32>("LadyLuck.Currency", 37711);
     ladyLuckCurrencyCount = sConfigMgr->GetOption<uint32>("LadyLuck.CurrencyCount", 3);
 
+    ladyLuckMoney = sConfigMgr->GetOption<uint32>("LadyLuck.Money", 1000000);
+
     ladyLuckTele.Map = sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449);
     ladyLuckTele.X = sConfigMgr->GetOption<float>("LadyLuck.TeleX", 0.072697);
     ladyLuckTele.Y = sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815);

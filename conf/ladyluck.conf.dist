@@ -32,6 +32,14 @@ LadyLuck.Currency = 37711
 
 LadyLuck.CurrencyCount = 3
 
+#
+#    LadyLuck.Money
+#        Description: The amount of money used to enter the lottery room in copper.
+#        Default:     1000000
+#
+
+LadyLuck.Money = 1000000
+
 ########################################
 # Lottery Location
 ########################################
