@@ -283,7 +283,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         else
         {
             delete item;
-            OpenLotteryBox(player);
+            player->SendItemRetrievalMail({ {lootItem.itemId, lootItem.itemCount} });
         }
     }
 }
