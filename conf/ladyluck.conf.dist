@@ -49,7 +49,7 @@ LadyLuck.Money = 1000000
 #        Default:     449
 #
 
-LadyLuck.Map = 449
+LadyLuck.TeleMap = 449
 
 #
 #    LadyLuck.X
@@ -57,7 +57,7 @@ LadyLuck.Map = 449
 #        Default:     0.072697
 #
 
-LadyLuck.X = 0.072697
+LadyLuck.TeleX = 0.072697
 
 #
 #    LadyLuck.Y
@@ -65,7 +65,7 @@ LadyLuck.X = 0.072697
 #        Default:     9.618815
 #
 
-LadyLuck.Y = 9.618815
+LadyLuck.TeleY = 9.618815
 
 #
 #    LadyLuck.Z
@@ -73,7 +73,7 @@ LadyLuck.Y = 9.618815
 #        Default:     -0.227239
 #
 
-LadyLuck.Z = -0.227239
+LadyLuck.TeleZ = -0.227239
 
 #
 #    LadyLuck.O
@@ -81,6 +81,6 @@ LadyLuck.Z = -0.227239
 #        Default:     1.584149
 #
 
-LadyLuck.O = 1.584149
+LadyLuck.TeleO = 1.584149
 
 ########################################
