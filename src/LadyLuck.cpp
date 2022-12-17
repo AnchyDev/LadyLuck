@@ -251,7 +251,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
     {
-        if (it->roll <= roll)
+        if (it->roll >= roll)
         {
             lootPool.push_back(*it);
         }
