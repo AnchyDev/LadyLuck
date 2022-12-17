@@ -3,31 +3,49 @@
 bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 {
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to enter the lottery.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+
+    AddGossipItemFor(player,
+        GOSSIP_ICON_CHAT,
+        Acore::StringFormat("I would like to enter the lottery. [{}]x{}",
+        sObjectMgr->GetItemLocale(ladyLuckCurrency)->Name, ladyLuckCurrencyCount),
+        GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
+
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
     SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT, creature->GetGUID());
 
     return true;
 }
 
-void LadyLuckCreatureScript::EnterLottery(Player* player)
+void LadyLuckCreatureScript::EnterLottery(Player* player, bool retry)
 {
     CloseGossipMenuFor(player);
     DeductCurrency(player, ladyLuckCurrencyCount);
 
-    PlayerInfo playerInfo;
+    if (!retry)
+    {
+        PlayerLotteryInfo playerInfo;
 
-    playerInfo.playerGuid = player->GetGUID();
+        playerInfo.playerGuid = player->GetGUID();
 
-    playerInfo.previousLocation.Map = player->GetMapId();
-    playerInfo.previousLocation.X = player->GetPositionX();
-    playerInfo.previousLocation.Y = player->GetPositionY();
-    playerInfo.previousLocation.Z = player->GetPositionZ();
-    playerInfo.previousLocation.O = player->GetOrientation();
+        playerInfo.previousLocation.Map = player->GetMapId();
+        playerInfo.previousLocation.X = player->GetPositionX();
+        playerInfo.previousLocation.Y = player->GetPositionY();
+        playerInfo.previousLocation.Z = player->GetPositionZ();
+        playerInfo.previousLocation.O = player->GetOrientation();
 
-    playerRestoreInfo.push_back(playerInfo);
+        playerInfo.canLoot = true;
 
-    player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+        playerLotteryInfo.push_back(playerInfo);
+
+        player->TeleportTo(ladyLuckTele.Map, ladyLuckTele.X, ladyLuckTele.Y, ladyLuckTele.Z, ladyLuckTele.O);
+    }
+    else
+    {
+        if (IsInLottery(player))
+        {
+            UpdateCanLoot(player, true);
+        }
+    }
 }
 
 void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
@@ -70,11 +88,86 @@ void LadyLuckCreatureScript::ValidateCurrency(Player* player, Creature* creature
     }
 }
 
+bool IsInLottery(Player* player)
+{
+    for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
+    {
+        if (it->playerGuid == player->GetGUID())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void UpdateCanLoot(Player* player, bool state)
+{
+    for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
+    {
+        if (it->playerGuid == player->GetGUID())
+        {
+            it->canLoot = state;
+        }
+    }
+}
+
+bool CanLoot(Player* player)
+{
+    for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
+    {
+        if (it->playerGuid == player->GetGUID())
+        {
+            return it->canLoot;
+        }
+    }
+
+    return false;
+}
+
+void LadyLuckCreatureScript::PromptExit(Player* player, Creature* creature)
+{
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, please.", GOSSIP_SENDER_MAIN, LADYLUCK_EXITLOTTERY);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY);
+    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_EXIT, creature->GetGUID());
+}
+
+void LadyLuckCreatureScript::ExitLottery(Player* player)
+{
+    CloseGossipMenuFor(player);
+
+    TeleportInfo* teleInfo;
+    std::vector<PlayerLotteryInfo>::iterator* itToRemove;
+    for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
+    {
+        if (it->playerGuid == player->GetGUID())
+        {
+            teleInfo = &it->previousLocation;
+            itToRemove = &it;
+            break;
+        }
+    }
+
+    RestorePlayer(player, teleInfo);
+    playerLotteryInfo.erase(*itToRemove);
+}
+
+void LadyLuckCreatureScript::RestorePlayer(Player* player, TeleportInfo* teleInfo)
+{
+    player->TeleportTo(teleInfo->Map, teleInfo->X, teleInfo->Y, teleInfo->Z, teleInfo->O);
+}
+
 bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     if (sender != GOSSIP_SENDER_MAIN)
     {
         return false;
+    }
+
+    if (IsInLottery(player))
+    {
+        PromptExit(player, creature);
     }
 
     switch (action)
@@ -84,7 +177,15 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
         break;
 
     case LADYLUCK_ENTERLOTTERY_SUCCESS:
-        EnterLottery(player);
+        EnterLottery(player, false);
+        break;
+
+    case LADYLUCK_ENTERLOTTERY_RETRY:
+        EnterLottery(player, true);
+        break;
+
+    case LADYLUCK_EXITLOTTERY:
+        ExitLottery(player);
         break;
 
     case LADYLUCK_GOODBYE:
@@ -99,9 +200,18 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
 bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
 {
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to open another box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
-    SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
+
+    if (CanLoot(player))
+    {
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Open the box", GOSSIP_SENDER_MAIN, LOTTERYBOX_OPEN);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I want to open a different box.", GOSSIP_SENDER_MAIN, LOTTERYBOX_GOODBYE);
+        SendGossipMenuFor(player, LOTTERYBOX_GOSSIPTEXT, go->GetGUID());
+    }
+    else
+    {
+        SendGossipMenuFor(player, LOTTERYBOX_DENY, go->GetGUID());
+    }
+    
     return true;
 }
 
@@ -116,6 +226,7 @@ bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/
     {
     case LOTTERYBOX_OPEN:
         ChatHandler(player->GetSession()).SendSysMessage("OPEN");
+
         break;
 
     case LOTTERYBOX_GOODBYE:
@@ -140,48 +251,10 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
 }
 
-bool LadyLuckPlayerScript::OnBeforeTeleport(Player* player, uint32 /*mapId*/, float /*x*/, float /*y*/, float /*z*/, float /*o*/, uint32 /*options*/, Unit* /*target*/)
-{
-    if (player->GetMapId() != ladyLuckTele.Map)
-    {
-        return true;
-    }
-
-    bool canRestore;
-    TeleportInfo restorePoint;
-    std::vector<PlayerInfo>::iterator restoreIt;
-
-    for (auto it = playerRestoreInfo.begin(); it != playerRestoreInfo.end(); ++it)
-    {
-        if (it != playerRestoreInfo.end())
-        {
-            if (it->playerGuid != player->GetGUID())
-            {
-                continue;
-            }
-
-            canRestore = true;
-            restorePoint = it->previousLocation;
-            restoreIt = it;
-            break;
-        }
-    }
-
-    if (canRestore)
-    {
-        playerRestoreInfo.erase(restoreIt);
-        player->TeleportTo(restorePoint.Map, restorePoint.X, restorePoint.Y, restorePoint.Z, restorePoint.O);
-        return false;
-    }
-
-    return true;
-}
-
 // Add all scripts in one
 void AddLadyLuckScripts()
 {
     new LadyLuckWorldScript();
-    new LadyLuckPlayerScript();
     new LadyLuckCreatureScript();
     new LadyLuckGameObjectScript();
 }

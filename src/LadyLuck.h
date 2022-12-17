@@ -17,18 +17,25 @@ struct TeleportInfo
     float O;
 };
 
-struct PlayerInfo
+struct PlayerLotteryInfo
 {
     TeleportInfo previousLocation;
     ObjectGuid playerGuid;
+    bool canLoot;
 };
 
 bool ladyLuckEnabled;
+
 uint32 ladyLuckCurrency;
 uint32 ladyLuckCurrencyCount;
+
 TeleportInfo ladyLuckTele;
 
-std::vector<PlayerInfo> playerRestoreInfo;
+std::vector<PlayerLotteryInfo> playerLotteryInfo;
+
+bool IsInLottery(Player* /*player*/);
+void UpdateCanLoot(Player* /*player*/, bool /*state*/);
+bool CanLoot(Player* /*player*/);
 
 class LadyLuckCreatureScript : public CreatureScript
 {
@@ -41,8 +48,14 @@ private:
         LADYLUCK_GOSSIPTEXT = 444111,
         LADYLUCK_GOSSIPTEXT_SUCCESS = 444112,
         LADYLUCK_GOSSIPTEXT_FAIL = 444113,
+        LADYLUCK_GOSSIPTEXT_EXIT = 444114,
+
         LADYLUCK_ENTERLOTTERY = 1000,
         LADYLUCK_ENTERLOTTERY_SUCCESS = 1001,
+        LADYLUCK_ENTERLOTTERY_RETRY = 1002,
+
+        LADYLUCK_EXITLOTTERY = 1101,
+
         LADYLUCK_GOODBYE = 1500
     };
 
@@ -51,7 +64,10 @@ private:
     void ValidateCurrency(Player* /*player*/, Creature* /*creature*/);
     void DeductCurrency(Player* /*player*/, uint32 /*count*/);
     bool CanEnterLottery(Player* /*player*/);
-    void EnterLottery(Player* /*player*/);
+    void EnterLottery(Player* /*player*/, bool /*retry*/);
+    void ExitLottery(Player* /*player*/);
+    void RestorePlayer(Player* /*player*/, TeleportInfo* /*teleInfo*/);
+    void PromptExit(Player* /*player*/, Creature* /*creature*/);
     void SayGoodbye(Player* /*player*/, Creature* /*creature*/);
 };
 
@@ -64,6 +80,7 @@ private:
     {
         LOTTERYBOX_GOSSIPTEXT = 444211,
         LOTTERYBOX_OPEN = 1000,
+        LOTTERYBOX_DENY = 1001,
         LOTTERYBOX_GOODBYE = 1500
     };
 
@@ -78,13 +95,4 @@ public:
 private:
     void OnAfterConfigLoad(bool /*reload*/) override;
 };
-
-class LadyLuckPlayerScript : public PlayerScript
-{
-public:
-    LadyLuckPlayerScript() : PlayerScript("LadyLuckPlayerScript") { }
-private:
-    bool OnBeforeTeleport(Player* /*player*/, uint32 /*mapId*/, float /*x*/, float /*y*/, float /*z*/, float /*o*/, uint32 /*options*/, Unit* /*target*/) override;
-};
-
 #endif //MODULE_LADYLUCK_H
