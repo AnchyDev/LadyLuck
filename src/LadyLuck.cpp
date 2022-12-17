@@ -180,7 +180,7 @@ void LadyLuckCreatureScript::DisplayLotteryOptions(Player* player, Creature* cre
     if (ladyLuckCurrency > 0)
     {
         std::string itemName = sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1;
-        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery ? | n | nThis will cost you : | n{}x[{}]", ladyLuckCurrencyCount, itemName);
+        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery?|n|nThis will cost you :|n{}x[{}]", ladyLuckCurrencyCount, itemName);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use currency.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_CURRENCY, ladyLuckCurrencyStr, 0, false);
     }
 
