@@ -270,6 +270,8 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         lootItem = lootPool.at(roll);
     }
 
+    LOG_INFO("module", "Won item {} : {} pre", lootItem.itemId, lootItem.itemCount);
+
     if (lootItem.itemId)
     {
         ItemPosCountVec dest;
@@ -277,10 +279,14 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         {
             player->StoreNewItem(dest, lootItem.itemId, true);
             UpdateCanLoot(player, false);
+
+            LOG_INFO("module", "Won item {} : {}", lootItem.itemId, lootItem.itemCount);
         }
         else
         {
             player->SendItemRetrievalMail({ {lootItem.itemId, lootItem.itemCount} });
+
+            LOG_INFO("module", "Won item {} : {} mail", lootItem.itemId, lootItem.itemCount);
         }
     }
 }
