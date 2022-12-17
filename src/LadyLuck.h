@@ -51,9 +51,10 @@ private:
     {
         LADYLUCK_GOSSIPTEXT = 444111,
         LADYLUCK_GOSSIPTEXT_SUCCESS = 444112,
-        LADYLUCK_GOSSIPTEXT_FAIL = 444113,
-        LADYLUCK_GOSSIPTEXT_EXIT = 444114,
-        LADYLUCK_GOSSIPTEXT_SELECT_CURRENCY = 444115,
+        LADYLUCK_GOSSIPTEXT_FAIL_CURRENCY = 444113,
+        LADYLUCK_GOSSIPTEXT_FAIL_MONEY = 444114,
+        LADYLUCK_GOSSIPTEXT_EXIT = 444115,
+        LADYLUCK_GOSSIPTEXT_SELECT_COST = 444116,
 
         LADYLUCK_ENTERLOTTERY = 1000,
         LADYLUCK_ENTERLOTTERY_SUCCESS = 1001,
@@ -70,7 +71,8 @@ private:
     bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) override;
     void ValidateCurrency(Player* /*player*/, Creature* /*creature*/);
     void DeductCurrency(Player* /*player*/, uint32 /*count*/);
-    bool CanEnterLottery(Player* /*player*/);
+    void ValidateMoney(Player* /*player*/, Creature* /*creature*/);
+    void DeductMoney(Player* /*player*/, uint32 /*amount*/);
     void EnterLottery(Player* /*player*/);
     void DisplayLotteryOptions(Player* /*player*/, Creature* /*creature*/);
     void ExitLottery(Player* /*player*/);

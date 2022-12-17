@@ -43,18 +43,6 @@ void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
     CloseGossipMenuFor(player);
 }
 
-bool LadyLuckCreatureScript::CanEnterLottery(Player* player)
-{
-    uint32 currencyAmount = player->GetItemCount(ladyLuckCurrency, false);
-
-    if (currencyAmount < ladyLuckCurrencyCount)
-    {
-        return false;
-    }
-
-    return true;
-}
-
 void LadyLuckCreatureScript::DeductCurrency(Player* player, uint32 count)
 {
     Item* currency = player->GetItemByEntry(ladyLuckCurrency);
@@ -63,7 +51,9 @@ void LadyLuckCreatureScript::DeductCurrency(Player* player, uint32 count)
 
 void LadyLuckCreatureScript::ValidateCurrency(Player* player, Creature* creature)
 {
-    if (CanEnterLottery(player))
+    uint32 currencyAmount = player->GetItemCount(ladyLuckCurrency, false);
+
+    if (currencyAmount >= ladyLuckCurrencyCount)
     {
         CloseGossipMenuFor(player);
         DeductCurrency(player, ladyLuckCurrencyCount);
@@ -73,8 +63,31 @@ void LadyLuckCreatureScript::ValidateCurrency(Player* player, Creature* creature
     {
         ClearGossipMenuFor(player);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
-        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL, creature->GetGUID());
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL_CURRENCY, creature->GetGUID());
     }
+}
+
+void LadyLuckCreatureScript::ValidateMoney(Player* player, Creature* creature)
+{
+    uint32 playerMoney = player->GetMoney();
+
+    if (playerMoney >= ladyLuckMoney)
+    {
+        CloseGossipMenuFor(player);
+        DeductMoney(player, ladyLuckMoney);
+        EnterLottery(player);
+    }
+    else
+    {
+        ClearGossipMenuFor(player);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I see, goodbye.", GOSSIP_SENDER_MAIN, LADYLUCK_GOODBYE);
+        SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_FAIL_MONEY, creature->GetGUID());
+    }
+}
+
+void LadyLuckCreatureScript::DeductMoney(Player* player, uint32 amount)
+{
+    player->ModifyMoney(-amount, true);
 }
 
 bool IsInLottery(Player* player)
@@ -118,7 +131,7 @@ void LadyLuckCreatureScript::PromptExit(Player* player, Creature* creature)
 {
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Yes, please.", GOSSIP_SENDER_MAIN, LADYLUCK_EXITLOTTERY);
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_RETRY);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "No, I would like to open another box.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
     SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_EXIT, creature->GetGUID());
 }
 
@@ -167,7 +180,7 @@ void LadyLuckCreatureScript::DisplayLotteryOptions(Player* player, Creature* cre
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use currency.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_CURRENCY, ladyLuckCurrencyStr, 0, false);
     }
 
-    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SELECT_CURRENCY, creature);
+    SendGossipMenuFor(player, LADYLUCK_GOSSIPTEXT_SELECT_COST, creature);
 }
 
 bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
@@ -188,8 +201,7 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
         break;
 
     case LADYLUCK_ENTERLOTTERY_GOLD:
-        CloseGossipMenuFor(player);
-        EnterLottery(player);
+        ValidateMoney(player, creature);
         break;
 
     case LADYLUCK_EXITLOTTERY:
