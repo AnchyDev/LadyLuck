@@ -179,6 +179,8 @@ void LadyLuckCreatureScript::DisplayLotteryOptions(Player* player, Creature* cre
 
     if (ladyLuckCurrency > 0)
     {
+        std::string itemName = sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1;
+        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery ? | n | nThis will cost you : | n{}x[{}]", ladyLuckCurrencyCount, itemName);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "I would like to use currency.", GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY_CURRENCY, ladyLuckCurrencyStr, 0, false);
     }
 
@@ -273,12 +275,6 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool /*reload*/)
     ladyLuckTele.Y = sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815);
     ladyLuckTele.Z = sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239);
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
-
-    if (ladyLuckCurrency > 0)
-    {
-        std::string itemName = sObjectMgr->GetItemTemplate(ladyLuckCurrency)->Name1;
-        ladyLuckCurrencyStr = Acore::StringFormatFmt("Are you sure you would like to enter the lottery ? | n | nThis will cost you : | n{}x[{}]", ladyLuckCurrencyCount, itemName);
-    }
 }
 
 // Add all scripts in one
