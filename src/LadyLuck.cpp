@@ -6,7 +6,7 @@ bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 
     AddGossipItemFor(player,
         GOSSIP_ICON_CHAT,
-        Acore::StringFormat("I would like to enter the lottery. [{}]x{}",
+        Acore::StringFormatFmt("I would like to enter the lottery. [{}]x{}",
         sObjectMgr->GetItemLocale(ladyLuckCurrency)->Name, ladyLuckCurrencyCount),
         GOSSIP_SENDER_MAIN, LADYLUCK_ENTERLOTTERY);
 
