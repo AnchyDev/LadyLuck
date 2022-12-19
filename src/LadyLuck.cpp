@@ -330,6 +330,7 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 
     if (!result)
     {
+        LOG_ERROR("module", "Failed to load `ladyluck_lottery_loot table!");
         return;
     }
 
