@@ -1,4 +1,4 @@
-# ![Azeroth Core](https://i.imgur.com/fQwb8m3.png) Lady Luck
+# ![LadyLuckLootRoom](https://cdn.discordapp.com/attachments/1044771877559750706/1054683845947039774/lootroom.png)
 
 ## About
 
