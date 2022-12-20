@@ -278,6 +278,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
             Item* item = player->StoreNewItem(dest, lootItem.itemId, true);
             player->SendNewItem(item, lootItem.itemCount, true, false);
             UpdateCanLoot(player, false);
+            LOG_INFO("module", "Item: {}, Count: {}, MinLvl: {}, MaxLvl: {}, Roll: {}", lootItem.itemId, lootItem.itemCount, lootItem.levelMin, lootItem.levelMax, lootItem.roll);
         }
         else
         {
