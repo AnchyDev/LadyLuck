@@ -251,12 +251,25 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
     {
-        if (roll <= it->roll &&
-            (player->getLevel() >= it->levelMin &&
-                player->getLevel() <= it->levelMax))
+        if (!(roll <= it->roll))
         {
-            lootPool.push_back(*it);
+            LOG_INFO("module", "1: {}", it->roll);
+            continue;
         }
+
+        if (!(player->getLevel() >= it->levelMin))
+        {
+            LOG_INFO("module", "2: {}:{}", it->levelMin, player->getLevel());
+            continue;
+        }
+
+        if (!(player->getLevel() <= it->levelMax))
+        {
+            LOG_INFO("module", "3: {}:{}", it->levelMax, player->getLevel());
+            continue;
+        }
+
+        lootPool.push_back(*it);
     }
 
     LotteryLoot lootItem;
