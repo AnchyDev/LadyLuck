@@ -263,7 +263,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     if (lootPool.size() == 0)
     {
-        LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but no item matched his criteria!", player->GetPlayerName());
+        LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but no item matched his criteria!", player->GetName());
         return;
     }
     else
