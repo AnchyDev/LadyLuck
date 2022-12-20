@@ -50,6 +50,7 @@ std::vector<LotteryLoot> lotteryLootPool;
 bool IsInLottery(Player* /*player*/);
 void UpdateCanLoot(Player* /*player*/, bool /*state*/);
 bool CanLoot(Player* /*player*/);
+std::vector<LotteryLoot> GetLootForRoll(uint32 /*roll*/);
 
 class LadyLuckCreatureScript : public CreatureScript
 {

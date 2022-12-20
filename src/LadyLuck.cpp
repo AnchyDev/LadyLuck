@@ -242,11 +242,8 @@ bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
     return true;
 }
 
-void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
+std::vector<LotteryLoot> GetLootForRoll(Player* player, uint32 roll)
 {
-    CloseGossipMenuFor(player);
-
-    uint32 roll = urand(0, 100);
     std::vector<LotteryLoot> lootPool;
 
     for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
@@ -259,12 +256,27 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
         }
     }
 
+    return lootPool;
+}
+
+void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
+{
+    CloseGossipMenuFor(player);
+
+    uint32 roll = urand(0, 100);
+    std::vector<LotteryLoot> lootPool = GetLootForRoll(player, roll);
+
     LotteryLoot lootItem;
 
     if (lootPool.size() == 0)
     {
-        LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but no item matched his criteria!", player->GetName());
-        return;
+        //Failed to meet criteria with roll, re-roll with a roll of 100.
+        lootPool = GetLootForRoll(player, 100);
+        if (lootPool.size() == 0)
+        {
+            LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but no item matched his criteria!", player->GetName());
+            return;
+        }
     }
     else
     {
