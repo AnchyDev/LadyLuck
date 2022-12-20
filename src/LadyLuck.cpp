@@ -325,7 +325,10 @@ void LadyLuckWorldScript::OnShutdownInitiate(ShutdownExitCode /*code*/, Shutdown
 {
     for (auto& pLotInfo : playerLotteryInfo)
     {
-        CharacterDatabase.Execute("REPLACE INTO `ladyluck_restore_info` (guid, canLoot, map, x, y, z, o) VALUES ({}, {}, {}, {}, {}, {}, {})");
+        CharacterDatabase.Execute("REPLACE INTO `ladyluck_restore_info` (guid, canLoot, map, x, y, z, o) VALUES ({}, {}, {}, {}, {}, {}, {})",
+            pLotInfo.playerGuid.GetRawValue(), pLotInfo.canLoot,
+            pLotInfo.previousLocation.Map,
+            pLotInfo.previousLocation.X, pLotInfo.previousLocation.Y, pLotInfo.previousLocation.Z, pLotInfo.previousLocation.O);
     }
 }
 
