@@ -251,7 +251,9 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
     {
-        if (it->roll >= roll && (player->getLevel() >= it->levelMin && player->getLevel() <= it->levelMax))
+        if (roll <= it->roll &&
+            (player->getLevel() >= it->levelMin &&
+                player->getLevel() <= it->levelMax))
         {
             lootPool.push_back(*it);
         }
@@ -261,8 +263,8 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     if (lootPool.size() == 0)
     {
-        roll = urand(0, lotteryLootPool.size() - 1);
-        lootItem = lotteryLootPool.at(roll);
+        LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but no item matched his criteria!", player->GetPlayerName());
+        return;
     }
     else
     {
@@ -278,7 +280,6 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
             Item* item = player->StoreNewItem(dest, lootItem.itemId, true);
             player->SendNewItem(item, lootItem.itemCount, true, false);
             UpdateCanLoot(player, false);
-            LOG_INFO("module", "Item: {}, Count: {}, MinLvl: {}, MaxLvl: {}, Roll: {}", lootItem.itemId, lootItem.itemCount, lootItem.levelMin, lootItem.levelMax, lootItem.roll);
         }
         else
         {
