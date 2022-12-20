@@ -251,7 +251,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
 
     for (auto it = lotteryLootPool.begin(); it != lotteryLootPool.end(); ++it)
     {
-        if (it->roll >= roll)
+        if (it->roll >= roll && (player->getLevel() >= it->levelMin && player->getLevel() <= it->levelMax))
         {
             lootPool.push_back(*it);
         }
@@ -327,7 +327,7 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
     ladyLuckTele.Z = sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239);
     ladyLuckTele.O = sConfigMgr->GetOption<float>("LadyLuck.TeleO", 1.584149);
 
-    QueryResult result = WorldDatabase.Query("SELECT item_id, item_count, roll FROM ladyluck_lottery_loot");
+    QueryResult result = WorldDatabase.Query("SELECT item_id, item_count, level_min, level_max, roll FROM ladyluck_lottery_loot");
 
     if (!result)
     {
@@ -342,7 +342,9 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 
         lotteryLoot.itemId = fields[0].Get<uint32>();
         lotteryLoot.itemCount = fields[1].Get<uint32>();
-        lotteryLoot.roll = fields[2].Get<uint32>();
+        lotteryLoot.levelMin = fields[2].Get<uint32>();
+        lotteryLoot.levelMax = fields[3].Get<uint32>();
+        lotteryLoot.roll = fields[4].Get<uint32>();
 
         lotteryLootPool.push_back(lotteryLoot);
     } while (result->NextRow());

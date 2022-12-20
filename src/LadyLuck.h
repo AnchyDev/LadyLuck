@@ -28,6 +28,8 @@ struct LotteryLoot
 {
     uint32 itemId;
     uint32 itemCount;
+    uint32 levelMin;
+    uint32 levelMax;
     uint32 roll;
 };
 
