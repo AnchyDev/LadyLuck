@@ -116,5 +116,6 @@ public:
     LadyLuckWorldScript() : WorldScript("LadyLuckWorldScript") { }
 private:
     void OnAfterConfigLoad(bool /*reload*/) override;
+    void OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/) override;
 };
 #endif //MODULE_LADYLUCK_H

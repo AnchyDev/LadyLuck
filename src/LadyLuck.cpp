@@ -321,6 +321,14 @@ bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/
     return true;
 }
 
+void LadyLuckWorldScript::OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/)
+{
+    for (auto& pLotInfo : playerLotteryInfo)
+    {
+        CharacterDatabase.Execute("REPLACE INTO `ladyluck_restore_info` (guid, canLoot, map, x, y, z, o) VALUES ({}, {}, {}, {}, {}, {}, {})");
+    }
+}
+
 void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 {
     if (reload)
@@ -361,6 +369,36 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
         lotteryLoot.roll = fields[4].Get<uint32>();
 
         lotteryLootPool.push_back(lotteryLoot);
+    } while (result->NextRow());
+
+    result = CharacterDatabase.Query("SELECT guid, canLoot, map, x, y, z, o FROM ladyluck_restore_info");
+
+    if (!result)
+    {
+        LOG_ERROR("module", "Failed to load `ladyluck_restore_info` table!");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        TeleportInfo teleInfo =
+        {
+            fields[2].Get<uint32>(), //Map
+            fields[3].Get<float>(), //X
+            fields[4].Get<float>(), //Y
+            fields[5].Get<float>(), //Z
+            fields[6].Get<float>() //O
+        };
+        PlayerLotteryInfo pLotInfo =
+        {
+            teleInfo, //TeleportInfo
+            ObjectGuid(fields[0].Get<uint64>()), //Guid
+            fields[1].Get<bool>() //CanLoot
+        };
+
+        playerLotteryInfo.push_back(pLotInfo);
     } while (result->NextRow());
 }
 
