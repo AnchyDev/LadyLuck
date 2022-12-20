@@ -15,6 +15,8 @@ If you talk to Lady Luck she will teleport you to the lottery room at the cost o
 ## Install
 
 - **[Clone](https://git-scm.com/docs/git-clone)** this repository into your `./azerothcore-wotlk/modules` folder.
+- Re-run cmake.
+- Re-recompile.
 - You're done!
 
 ## Contact
