@@ -22,6 +22,7 @@ struct PlayerLotteryInfo
     TeleportInfo previousLocation;
     ObjectGuid playerGuid;
     bool canLoot;
+    bool inLottery;
 };
 
 struct LotteryLoot

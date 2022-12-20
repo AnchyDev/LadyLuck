@@ -34,6 +34,7 @@ void LadyLuckCreatureScript::EnterLottery(Player* player)
         playerInfo.previousLocation.O = player->GetOrientation();
 
         playerInfo.canLoot = true;
+        playerInfo.inLottery = true;
 
         playerLotteryInfo.push_back(playerInfo);
 
@@ -101,7 +102,7 @@ bool IsInLottery(Player* player)
 {
     for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
     {
-        if (it->playerGuid == player->GetGUID())
+        if (it->playerGuid == player->GetGUID() && it->inLottery)
         {
             return true;
         }
@@ -146,23 +147,14 @@ void LadyLuckCreatureScript::ExitLottery(Player* player)
 {
     CloseGossipMenuFor(player);
 
-    TeleportInfo* teleInfo = nullptr;
-    std::vector<PlayerLotteryInfo>::iterator* itToRemove = nullptr;
-
     for (auto it = playerLotteryInfo.begin(); it != playerLotteryInfo.end(); ++it)
     {
         if (it->playerGuid == player->GetGUID())
         {
-            teleInfo = &it->previousLocation;
-            itToRemove = &it;
+            RestorePlayer(player, &it->previousLocation);
+            it->inLottery = false;
             break;
         }
-    }
-
-    if(teleInfo != nullptr && itToRemove != nullptr)
-    {
-        RestorePlayer(player, teleInfo);
-        playerLotteryInfo.erase(*itToRemove);
     }
 }
 
@@ -325,10 +317,17 @@ void LadyLuckWorldScript::OnShutdownInitiate(ShutdownExitCode /*code*/, Shutdown
 {
     for (auto& pLotInfo : playerLotteryInfo)
     {
-        CharacterDatabase.Execute("REPLACE INTO `ladyluck_restore_info` (guid, canLoot, map, x, y, z, o) VALUES ({}, {}, {}, {}, {}, {}, {})",
-            pLotInfo.playerGuid.GetRawValue(), pLotInfo.canLoot,
-            pLotInfo.previousLocation.Map,
-            pLotInfo.previousLocation.X, pLotInfo.previousLocation.Y, pLotInfo.previousLocation.Z, pLotInfo.previousLocation.O);
+        if (pLotInfo.inLottery)
+        {
+            CharacterDatabase.Execute("REPLACE INTO `ladyluck_restore_info` (guid, canLoot, map, x, y, z, o) VALUES ({}, {}, {}, {}, {}, {}, {})",
+                pLotInfo.playerGuid.GetRawValue(), pLotInfo.canLoot,
+                pLotInfo.previousLocation.Map,
+                pLotInfo.previousLocation.X, pLotInfo.previousLocation.Y, pLotInfo.previousLocation.Z, pLotInfo.previousLocation.O);
+        }
+        else
+        {
+            CharacterDatabase.Execute("DELETE FROM `ladyluck_restore_info` WHERE guid = {}", pLotInfo.playerGuid.GetRawValue());
+        }
     }
 }
 
@@ -398,7 +397,8 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
         {
             teleInfo, //TeleportInfo
             ObjectGuid(fields[0].Get<uint64>()), //Guid
-            fields[1].Get<bool>() //CanLoot
+            fields[1].Get<bool>(), //CanLoot
+            true //InLottery
         };
 
         playerLotteryInfo.push_back(pLotInfo);
