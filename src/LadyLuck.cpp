@@ -2,6 +2,11 @@
 
 bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 {
+    if (!ladyLuckEnabled)
+    {
+        return true;
+    }
+
     ClearGossipMenuFor(player);
 
     if (IsInLottery(player))
@@ -218,6 +223,11 @@ bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, 
 
 bool LadyLuckGameObjectScript::OnGossipHello(Player* player, GameObject* go)
 {
+    if (!ladyLuckEnabled)
+    {
+        return true;
+    }
+
     ClearGossipMenuFor(player);
 
     if (CanLoot(player))
