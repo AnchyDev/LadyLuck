@@ -258,7 +258,7 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
     uint32 roll = urand(0, 100);
     std::vector<LotteryLoot> lootPool = GetLootForRoll(player, roll);
 
-    LotteryLoot lootItem;
+    LotteryLoot lootItem = {};
 
     if (lootPool.size() == 0)
     {
@@ -270,10 +270,14 @@ void LadyLuckGameObjectScript::OpenLotteryBox(Player* player)
             return;
         }
     }
-    else
+
+    roll = urand(0, lootPool.size() - 1);
+    lootItem = lootPool.at(roll);
+
+    if (lootItem.itemId == 0)
     {
-        roll = urand(0, lootPool.size() - 1);
-        lootItem = lootPool.at(roll);
+        LOG_WARN("module", "Player '{}' tried to loot an item from the lottery box, but loot item is 0!", player->GetName());
+        return;
     }
 
     if (lootItem.itemId)
