@@ -1,4 +1,7 @@
-# ![LadyLuckLootRoom](https://cdn.discordapp.com/attachments/1044771877559750706/1054683845947039774/lootroom.png)
+# LadyLuckLootRoom
+
+> [!CAUTION]
+> This module is a has been abandoned. Don't expect support.
 
 ## About
 
