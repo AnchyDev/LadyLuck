@@ -1,7 +1,7 @@
 # LadyLuckLootRoom
 
 > [!CAUTION]
-> This module is a has been abandoned. Don't expect support.
+> This module has been abandoned. Don't expect support.
 
 ## About
 
