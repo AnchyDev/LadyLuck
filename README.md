@@ -1,13 +1,10 @@
 # LadyLuckLootRoom
 
-> [!CAUTION]
-> This module has been abandoned. Don't expect support.
-
 ## About
 
-Lady Luck is a module for Azeroth Core that implements a lottery room.
+Lady Luck is a module for Azeroth Core that adds a lottery room.
 
-If you talk to Lady Luck she will teleport you to the lottery room at the cost of either gold or a currency. The lottery room contains chests which you can open for items that have been defined in the `ladyluck_lottery_loot` table.
+If you talk to Lady Luck she will teleport you to the lottery room where you can open chests for items defined in the `ladyluck_lottery_loot` table.
 
 ## Features
 
