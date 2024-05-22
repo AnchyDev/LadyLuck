@@ -17,28 +17,20 @@
 LadyLuck.Enable = 0
 
 #
-#    LadyLuck.Currency
-#        Description: The currency used to enter the lottery room.
-#        Default:     37711
+#    LadyLuck.UnlockItem
+#        Description: The item used to open the lottery boxes.
+#        Default:     5518 (Tiny Iron Key)
 #
 
-LadyLuck.Currency = 37711
+LadyLuck.UnlockItem = 5518
 
 #
-#    LadyLuck.CurrencyCount
-#        Description: The amount of currency used to enter the lottery room.
-#        Default:     3
+#    LadyLuck.UnlockItemCount
+#        Description: The amount of item used to open the lottery boxes.
+#        Default:     1
 #
 
-LadyLuck.CurrencyCount = 3
-
-#
-#    LadyLuck.Money
-#        Description: The amount of money used to enter the lottery room in copper.
-#        Default:     1000000
-#
-
-LadyLuck.Money = 1000000
+LadyLuck.UnlockItemCount = 1
 
 ########################################
 # Lottery Location

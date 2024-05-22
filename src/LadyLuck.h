@@ -8,23 +8,6 @@
 #include <AI/ScriptedAI/ScriptedGossip.h>
 #include <vector>
 
-struct TeleportInfo
-{
-    uint32 Map;
-    float X;
-    float Y;
-    float Z;
-    float O;
-};
-
-struct PlayerLotteryInfo
-{
-    TeleportInfo previousLocation;
-    ObjectGuid playerGuid;
-    bool canLoot;
-    bool inLottery;
-};
-
 struct LotteryLoot
 {
     uint32 itemId;
@@ -34,22 +17,8 @@ struct LotteryLoot
     uint32 roll;
 };
 
-bool ladyLuckEnabled;
-
-uint32 ladyLuckCurrency;
-uint32 ladyLuckCurrencyCount;
-std::string ladyLuckCurrencyStr;
-
-uint32 ladyLuckMoney;
-std::string ladyLuckMoneyStr;
-
-TeleportInfo ladyLuckTele;
-
-std::vector<PlayerLotteryInfo> playerLotteryInfo;
 std::vector<LotteryLoot> lotteryLootPool;
 
-bool IsInLottery(Player* /*player*/);
-void UpdateCanLoot(Player* /*player*/, bool /*state*/);
 bool CanLoot(Player* /*player*/);
 std::vector<LotteryLoot> GetLootForRoll(uint32 /*roll*/);
 
@@ -81,14 +50,12 @@ private:
 
     bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) override;
     bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) override;
-    void ValidateCurrency(Player* /*player*/, Creature* /*creature*/);
-    void DeductCurrency(Player* /*player*/, uint32 /*count*/);
-    void ValidateMoney(Player* /*player*/, Creature* /*creature*/);
-    void DeductMoney(Player* /*player*/, uint32 /*amount*/);
+
     void EnterLottery(Player* /*player*/);
-    void DisplayLotteryOptions(Player* /*player*/, Creature* /*creature*/);
     void ExitLottery(Player* /*player*/);
-    void RestorePlayer(Player* /*player*/, TeleportInfo* /*teleInfo*/);
+    bool IsInLottery(Player* /*player*/);
+
+    void RestorePlayerLocation(Player* /*player*/);
     void PromptExit(Player* /*player*/, Creature* /*creature*/);
     void SayGoodbye(Player* /*player*/, Creature* /*creature*/);
 };
@@ -108,7 +75,11 @@ private:
 
     bool OnGossipHello(Player* /*player*/, GameObject* /*go*/) override;
     bool OnGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) override;
+
     void OpenLotteryBox(Player* /*player*/);
+    bool CanLoot(Player* /*player*/);
+    void DeductUnlockItem(Player* /*player*/);
+    void RewardLootItem(Player* /*player*/);
 };
 
 class LadyLuckWorldScript : public WorldScript
@@ -117,6 +88,5 @@ public:
     LadyLuckWorldScript() : WorldScript("LadyLuckWorldScript") { }
 private:
     void OnAfterConfigLoad(bool /*reload*/) override;
-    void OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/) override;
 };
 #endif //MODULE_LADYLUCK_H
