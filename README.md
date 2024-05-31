@@ -1,8 +1,8 @@
-# LadyLuckLootRoom
+# Lady Luck
 
 ## About
 
-Lady Luck is a module for Azeroth Core that adds a lottery room.
+Lady Luck is a module for Azeroth Core that adds a lucky dip lottery room.
 
 If you talk to Lady Luck she will teleport you to the lottery room where you can open chests for items defined in the `ladyluck_lottery_loot` table.
 
