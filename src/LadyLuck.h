@@ -21,6 +21,17 @@ std::vector<LotteryLoot> lotteryLootPool;
 
 bool CanLoot(Player* /*player*/);
 std::vector<LotteryLoot> GetLootForRoll(uint32 /*roll*/);
+void RestorePlayerLocation(Player* /*player*/, bool /*logout*/ = false);
+uint32 GetLotteryMapId();
+
+class LadyLuckPlayerScript : public PlayerScript
+{
+public:
+    LadyLuckPlayerScript() : PlayerScript("LadyLuckPlayerScript") { }
+
+private:
+    void OnLogout(Player* player) override;
+};
 
 class LadyLuckCreatureScript : public CreatureScript
 {
@@ -55,7 +66,6 @@ private:
     void ExitLottery(Player* /*player*/);
     bool IsInLottery(Player* /*player*/);
 
-    void RestorePlayerLocation(Player* /*player*/);
     void PromptExit(Player* /*player*/, Creature* /*creature*/);
     void SayGoodbye(Player* /*player*/, Creature* /*creature*/);
 };

@@ -1,5 +1,10 @@
 #include "LadyLuck.h"
 
+uint32 GetLotteryMapId()
+{
+    return sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449);
+}
+
 bool LadyLuckCreatureScript::OnGossipHello(Player* player, Creature* creature)
 {
     if (!sConfigMgr->GetOption<bool>("LadyLuck.Enable", false))
@@ -32,7 +37,7 @@ void LadyLuckCreatureScript::EnterLottery(Player* player)
     player->m_recallZ = player->GetPositionZ();
     player->m_recallO = player->GetOrientation();
 
-    player->TeleportTo(sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449),
+    player->TeleportTo(GetLotteryMapId(),
         sConfigMgr->GetOption<float>("LadyLuck.TeleX", 0.072697),
         sConfigMgr->GetOption<float>("LadyLuck.TeleY", 9.618815),
         sConfigMgr->GetOption<float>("LadyLuck.TeleZ", -0.227239),
@@ -46,7 +51,7 @@ void LadyLuckCreatureScript::SayGoodbye(Player* player, Creature* /*creature*/)
 
 bool LadyLuckCreatureScript::IsInLottery(Player* player)
 {
-    return player->GetMapId() == sConfigMgr->GetOption<uint32>("LadyLuck.TeleMap", 449);
+    return player->GetMapId() == GetLotteryMapId();
 }
 
 void LadyLuckCreatureScript::PromptExit(Player* player, Creature* creature)
@@ -65,9 +70,29 @@ void LadyLuckCreatureScript::ExitLottery(Player* player)
     RestorePlayerLocation(player);
 }
 
-void LadyLuckCreatureScript::RestorePlayerLocation(Player* player)
+void RestorePlayerLocation(Player* player, bool logout)
 {
-    player->TeleportTo(player->m_recallMap, player->m_recallX, player->m_recallY, player->m_recallZ, player->m_recallO);
+    // If the recall position is lost, send to homebind.
+    bool corrupted = player->m_recallMap == GetLotteryMapId();
+
+    auto map = corrupted ? player->m_homebindMapId : player->m_recallMap;
+    auto x = corrupted ? player->m_homebindX : player->m_recallX;
+    auto y = corrupted ? player->m_homebindY : player->m_recallY;
+    auto z = corrupted ? player->m_homebindZ : player->m_recallZ;
+    auto o = corrupted ? player->m_homebindO : player->m_recallO;
+
+    if (logout)
+    {
+        player->SetMapId(map);
+        player->Relocate(x, y, z);
+        player->SetOrientation(o);
+
+        player->SaveToDB(false, true);
+    }
+    else
+    {
+        player->TeleportTo(map, x, y, z, o);
+    }
 }
 
 bool LadyLuckCreatureScript::OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
@@ -222,6 +247,26 @@ bool LadyLuckGameObjectScript::OnGossipSelect(Player* player, GameObject* /*go*/
     return true;
 }
 
+void LadyLuckPlayerScript::OnLogout(Player* player)
+{
+    if (!sConfigMgr->GetOption<bool>("LadyLuck.Enable", false))
+    {
+        return;
+    }
+
+    if (!player || !player->IsInWorld())
+    {
+        return;
+    }
+
+    if (player->GetMapId() != GetLotteryMapId())
+    {
+        return;
+    }
+
+    RestorePlayerLocation(player, true);
+}
+
 void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 {
     if (reload)
@@ -255,6 +300,7 @@ void LadyLuckWorldScript::OnAfterConfigLoad(bool reload)
 void AddLadyLuckScripts()
 {
     new LadyLuckWorldScript();
+    new LadyLuckPlayerScript();
     new LadyLuckCreatureScript();
     new LadyLuckGameObjectScript();
 }
